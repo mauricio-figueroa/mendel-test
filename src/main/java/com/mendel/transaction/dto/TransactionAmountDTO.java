@@ -9,4 +9,8 @@ public class TransactionAmountDTO {
     public TransactionAmountDTO(final BigDecimal amount) {
         this.sum = amount;
     }
+
+    public BigDecimal getSum() {
+        return sum;
+    }
 }

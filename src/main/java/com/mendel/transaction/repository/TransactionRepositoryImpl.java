@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;
 
+import com.mendel.transaction.exception.TransactionAlreadyExistException;
 import com.mendel.transaction.model.Transaction;
 
 @Service
@@ -15,10 +16,13 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     private static final Map<String, List<Transaction>> TRANSACTION_TYPE_MAP = new HashMap<>();
 
     @Override
-    public Transaction save(final Transaction transaction) {
+    public Transaction save(final Transaction transaction) throws TransactionAlreadyExistException {
+        if (TRANSACTION_MAP.get(transaction.getId()) != null) {
+            throw TransactionAlreadyExistException.create();
+        }
         addToTransactionTypeMap(transaction);
-        TRANSACTION_TYPE_MAP.get(transaction.getType());
-        return TRANSACTION_MAP.put(transaction.getId(), transaction);
+        TRANSACTION_MAP.put(transaction.getId(), transaction);
+        return TRANSACTION_MAP.get(transaction.getId());
     }
 
 
