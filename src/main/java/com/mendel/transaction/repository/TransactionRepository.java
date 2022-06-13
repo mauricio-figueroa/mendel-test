@@ -4,12 +4,13 @@ import java.util.List;
 
 import com.mendel.transaction.exception.TransactionAlreadyExistException;
 import com.mendel.transaction.model.Transaction;
+import com.mendel.transaction.service.TransactionNode;
 
 public interface TransactionRepository {
 
-    Transaction save(final Transaction transaction) throws TransactionAlreadyExistException;
+    TransactionNode save(final Transaction transaction) throws TransactionAlreadyExistException;
 
-    Transaction get(final Long transactionID);
+    TransactionNode get(final Long transactionID);
 
     List<Transaction> getTransactionsByType(final String type);
 }

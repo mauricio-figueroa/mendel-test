@@ -27,7 +27,7 @@ public class TransactionServiceImpl implements TransactionService {
     public Transaction createTransaction(final TransactionRequestDTO transactionRequestDTO, final Long id) throws BusinessException {
         validateNewTransaction(transactionRequestDTO);
         Transaction transaction = new Transaction(id, transactionRequestDTO.getParentId(), transactionRequestDTO.getAmount(), transactionRequestDTO.getType());
-        return transactionRepository.save(transaction);
+        return transactionRepository.save(transaction).getCurrentTransaction();
     }
 
     @Override
@@ -44,8 +44,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     private void validateNewTransaction(final TransactionRequestDTO transactionRequestDTO) throws TransactionNotFoundException {
         if (transactionRequestDTO.getParentId() != null) {
-            final Transaction transaction = transactionRepository.get(transactionRequestDTO.getParentId());
-            if (transaction == null) {
+            final TransactionNode transactionNode = transactionRepository.get(transactionRequestDTO.getParentId());
+            if (transactionNode == null) {
                 throw TransactionNotFoundException.create();
             }
         }
@@ -53,16 +53,22 @@ public class TransactionServiceImpl implements TransactionService {
 
 
     private BigDecimal getTotalAmount(final Long id) throws TransactionNotFoundException {
-        final Transaction transaction = transactionRepository.get(id);
+        final TransactionNode transactionNode = transactionRepository.get(id);
 
-        if (transaction == null) {
+        if (transactionNode == null) {
             throw TransactionNotFoundException.create();
         }
+        final BigDecimal currentAmount = transactionNode.getCurrentTransaction().getAmount();
 
-        if (transaction.getParentId() == null) {
-            return transaction.getAmount();
+        if (transactionNode.getTransactionList().isEmpty()) {
+            return currentAmount;
         } else {
-            return transaction.getAmount().add(getTotalAmount(transaction.getParentId()));
+            BigDecimal sum = BigDecimal.ZERO;
+            for (final Long childID : transactionNode.getTransactionList()) {
+                sum = sum.add(getTotalAmount(childID));
+            }
+            return currentAmount.add(sum);
+
         }
 
     }
