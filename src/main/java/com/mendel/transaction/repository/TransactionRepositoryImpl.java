@@ -27,6 +27,15 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         return TRANSACTION_MAP.get(transactionID);
     }
 
+    @Override
+    public List<Transaction> getTransactionsByType(final String type) {
+        final List<Transaction> transactions = TRANSACTION_TYPE_MAP.get(type);
+        if (transactions == null) {
+            return List.of();
+        }
+        return transactions;
+    }
+
 
     private void addToTransactionTypeMap(final Transaction transaction) {
         List<Transaction> transactions = TRANSACTION_TYPE_MAP.get(transaction.getType());

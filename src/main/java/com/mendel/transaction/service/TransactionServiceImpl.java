@@ -1,6 +1,8 @@
 package com.mendel.transaction.service;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +33,12 @@ public class TransactionServiceImpl implements TransactionService {
     public TransactionAmountDTO getTransactionAmountById(final Long id) {
         final BigDecimal totalAmount = getTotalAmount(id);
         return new TransactionAmountDTO(totalAmount);
+    }
+
+    @Override
+    public List<Long> getTransactionsByType(final String type) {
+        final List<Transaction> transactions = transactionRepository.getTransactionsByType(type);
+        return transactions.stream().map(Transaction::getId).collect(Collectors.toList());
     }
 
     private BigDecimal getTotalAmount(final Long id) {
