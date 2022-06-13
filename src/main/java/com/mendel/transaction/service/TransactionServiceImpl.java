@@ -16,8 +16,6 @@ import com.mendel.transaction.repository.TransactionRepository;
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
-    private static final int TRANSACTION_ID_LENGTH = 16;
-
     private final TransactionRepository transactionRepository;
 
     @Autowired
@@ -32,15 +30,6 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionRepository.save(transaction);
     }
 
-    private void validateNewTransaction(final TransactionRequestDTO transactionRequestDTO) throws TransactionNotFoundException {
-        if (transactionRequestDTO.getParentId() != null) {
-            final Transaction transaction = transactionRepository.get(transactionRequestDTO.getParentId());
-            if (transaction == null) {
-                throw TransactionNotFoundException.create();
-            }
-        }
-    }
-
     @Override
     public TransactionAmountDTO getTransactionAmountById(final Long id) throws TransactionNotFoundException {
         final BigDecimal totalAmount = getTotalAmount(id);
@@ -52,6 +41,16 @@ public class TransactionServiceImpl implements TransactionService {
         final List<Transaction> transactions = transactionRepository.getTransactionsByType(type);
         return transactions.stream().map(Transaction::getId).collect(Collectors.toList());
     }
+
+    private void validateNewTransaction(final TransactionRequestDTO transactionRequestDTO) throws TransactionNotFoundException {
+        if (transactionRequestDTO.getParentId() != null) {
+            final Transaction transaction = transactionRepository.get(transactionRequestDTO.getParentId());
+            if (transaction == null) {
+                throw TransactionNotFoundException.create();
+            }
+        }
+    }
+
 
     private BigDecimal getTotalAmount(final Long id) throws TransactionNotFoundException {
         final Transaction transaction = transactionRepository.get(id);

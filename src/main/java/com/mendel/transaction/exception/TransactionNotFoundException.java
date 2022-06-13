@@ -2,6 +2,7 @@ package com.mendel.transaction.exception;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 
 public final class TransactionNotFoundException extends BusinessException {
 
@@ -15,10 +16,10 @@ public final class TransactionNotFoundException extends BusinessException {
   }
 
   public static TransactionNotFoundException create(final Throwable cause) {
-    return new TransactionNotFoundException(CREATION_ERROR_MESSAGE, SC_BAD_REQUEST, cause);
+    return new TransactionNotFoundException(CREATION_ERROR_MESSAGE, SC_NOT_FOUND, cause);
   }
 
   public static TransactionNotFoundException create() {
-    return new TransactionNotFoundException(CREATION_ERROR_MESSAGE, SC_BAD_REQUEST, null);
+    return new TransactionNotFoundException(CREATION_ERROR_MESSAGE, SC_NOT_FOUND, null);
   }
 }
