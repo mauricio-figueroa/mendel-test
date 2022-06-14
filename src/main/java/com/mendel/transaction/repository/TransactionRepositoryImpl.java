@@ -8,26 +8,37 @@ import org.springframework.stereotype.Service;
 
 import com.mendel.transaction.exception.TransactionAlreadyExistException;
 import com.mendel.transaction.model.Transaction;
+import com.mendel.transaction.service.TransactionNode;
 
 @Service
 public class TransactionRepositoryImpl implements TransactionRepository {
 
-    private static final Map<Long, Transaction> TRANSACTION_MAP = new HashMap<>();
+    private static final Map<Long, TransactionNode> TRANSACTION_MAP = new HashMap<>();
     private static final Map<String, List<Transaction>> TRANSACTION_TYPE_MAP = new HashMap<>();
 
     @Override
-    public Transaction save(final Transaction transaction) throws TransactionAlreadyExistException {
+    public TransactionNode save(final Transaction transaction) throws TransactionAlreadyExistException {
         if (TRANSACTION_MAP.get(transaction.getId()) != null) {
             throw TransactionAlreadyExistException.create();
         }
         addToTransactionTypeMap(transaction);
-        TRANSACTION_MAP.put(transaction.getId(), transaction);
+        TransactionNode transactionNode = new TransactionNode(transaction);
+        TRANSACTION_MAP.put(transaction.getId(), transactionNode);
+        addToParents(transaction);
         return TRANSACTION_MAP.get(transaction.getId());
+    }
+
+    private void addToParents(final Transaction transaction) {
+        if (transaction.getParentId() != null) {
+            final TransactionNode transactionParentNode = TRANSACTION_MAP.get(transaction.getParentId());
+            transactionParentNode.addTransaction(transaction);
+            addToTransactionTypeMap(transactionParentNode.getCurrentTransaction());
+        }
     }
 
 
     @Override
-    public Transaction get(final Long transactionID) {
+    public TransactionNode get(final Long transactionID) {
         return TRANSACTION_MAP.get(transactionID);
     }
 
