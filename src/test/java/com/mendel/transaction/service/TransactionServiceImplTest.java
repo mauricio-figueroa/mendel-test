@@ -1,6 +1,7 @@
 package com.mendel.transaction.service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import com.mendel.transaction.dto.TransactionAmountDTO;
 import com.mendel.transaction.dto.TransactionRequestDTO;
@@ -35,7 +36,8 @@ class TransactionServiceImplTest {
     void createTransactionSuccess() throws BusinessException {
         final TransactionRequestDTO transactionRequestDTO = new TransactionRequestDTO(null, BigDecimal.valueOf(122.5), "card");
         final Transaction transaction = new Transaction(1L, transactionRequestDTO.getParentId(), transactionRequestDTO.getAmount(), transactionRequestDTO.getType());
-        Mockito.when(transactionRepository.save(any())).thenReturn(transaction);
+
+        Mockito.when(transactionRepository.save(any())).thenReturn(new TransactionNode(transaction));
 
         final Transaction transactionResponse = target.createTransaction(transactionRequestDTO, 1L);
 
@@ -72,7 +74,6 @@ class TransactionServiceImplTest {
                 transactionNotFoundException.getStatusCode(),
                 "Transaction doesn't exist");
     }
-/*
 
 
     @Test
@@ -81,14 +82,54 @@ class TransactionServiceImplTest {
         Transaction transaction1 = new Transaction(1L, null, BigDecimal.valueOf(150.5), "cards");
         Transaction transaction2 = new Transaction(2L, 1L, BigDecimal.valueOf(149.5), "cards");
 
+        TransactionNode transactionNode1 = new TransactionNode(transaction1);
+        transactionNode1.addTransaction(transaction2);
+        TransactionNode transactionNode2 = new TransactionNode(transaction2);
+        Mockito.when(transactionRepository.get(transaction1.getId())).thenReturn(transactionNode1);
+        Mockito.when(transactionRepository.get(transaction2.getId())).thenReturn(transactionNode2);
+
+
         final TransactionAmountDTO transactionAmountById = target.getTransactionAmountById(1L);
 
         assertEquals(
-                BigDecimal.valueOf(300),
+                BigDecimal.valueOf(300.0),
                 transactionAmountById.getSum(),
-                "tx validator status doesn't match");
+                "value doesn't match");
     }
-*/
 
+    @Test
+    void getTransactionAmountByIdError_NotFound() {
+
+        Transaction transaction1 = new Transaction(1L, null, BigDecimal.valueOf(150.5), "cards");
+        Transaction transaction2 = new Transaction(2L, 1L, BigDecimal.valueOf(149.5), "cards");
+
+        TransactionNode transactionNode1 = new TransactionNode(transaction1);
+        transactionNode1.addTransaction(transaction2);
+        Mockito.when(transactionRepository.get(transaction1.getId())).thenReturn(transactionNode1);
+        Mockito.when(transactionRepository.get(transaction2.getId())).thenReturn(null);
+
+        final TransactionNotFoundException transactionNotFoundException =
+                assertThrows(TransactionNotFoundException.class, () -> target.getTransactionAmountById(1L));
+
+        assertEquals(
+                SC_NOT_FOUND,
+                transactionNotFoundException.getStatusCode(),
+                "Transaction doesn't exist");
+    }
+
+
+    @Test
+    void getTransactionsByType() {
+        Transaction transaction1 = new Transaction(1L, null, BigDecimal.valueOf(150.5), "cards");
+
+        Mockito.when(transactionRepository.getTransactionsByType(transaction1.getType())).thenReturn(List.of(transaction1));
+
+        final List<Long> transaction = target.getTransactionsByType(transaction1.getType());
+
+        assertEquals(
+                transaction,
+                List.of(1L),
+                "transaction id list doesn't match");
+    }
 
 }
