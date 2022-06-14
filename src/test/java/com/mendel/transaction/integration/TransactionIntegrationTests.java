@@ -123,10 +123,13 @@ class TransactionIntegrationTests {
                 andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE)).andExpect(content().json("[1]"));
 
         this.mockMvc.perform(get("/transactions/types/ecommerce")).
-                andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE)).andExpect(content().json("[1]"));
+                andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE)).andExpect(content().json("[2]"));
 
         this.mockMvc.perform(get("/transactions/types/presential")).
                 andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE)).andExpect(content().json("[3,4]"));
+
+        this.mockMvc.perform(get("/transactions/types/notexist")).
+                andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE)).andExpect(content().json("[]"));
     }
 
 

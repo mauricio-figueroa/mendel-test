@@ -32,7 +32,6 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         if (transaction.getParentId() != null) {
             final TransactionNode transactionParentNode = TRANSACTION_MAP.get(transaction.getParentId());
             transactionParentNode.addTransaction(transaction);
-            addToTransactionTypeMap(transactionParentNode.getCurrentTransaction());
         }
     }
 
