@@ -28,7 +28,7 @@ public class TransactionController {
     }
 
     @Valid
-    @PutMapping(path = "transactions/{id}",
+    @PutMapping(path = "/transactions/{id}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Transaction> createTransaction(@Valid @RequestBody final TransactionRequestDTO newTransaction, @NotBlank(message = "id can't be blank") @PathVariable final Long id) throws BusinessException {
@@ -37,7 +37,7 @@ public class TransactionController {
     }
 
     @Valid
-    @GetMapping(path = "transaction/sum/{id}",
+    @GetMapping(path = "/transactions/sum/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TransactionAmountDTO> getTransactionAmount(@NotBlank(message = "id can't be blank") @PathVariable final Long id) throws TransactionNotFoundException {
         final TransactionAmountDTO transactionAmountById = transactionService.getTransactionAmountById(id);
@@ -45,7 +45,7 @@ public class TransactionController {
     }
 
     @Valid
-    @GetMapping(path = "transaction/types/{type}",
+    @GetMapping(path = "/transactions/types/{type}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Long>> getTransactionByType(@NotBlank(message = "type can't be blank") @PathVariable final String type) {
         List<Long> transactionIDs = transactionService.getTransactionsByType(type);
